@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P2P Задания</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f3ee;
+    --warm-white: #fdfaf7;
+    --ink: #1c1a18;
+    --ink-light: #4a4540;
+    --ink-faint: #9a948e;
+    --amber: #c8792a;
+    --amber-light: #f0d4b0;
+    --amber-pale: #faf0e4;
+    --green: #3a7a5a;
+    --green-pale: #e8f4ee;
+    --red-pale: #fceeed;
+    --red: #c0392b;
+    --border: #e2dbd4;
+    --shadow: 0 2px 16px rgba(28,26,24,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
+  }
+
+  .logo span {
+    color: var(--amber);
+  }
+
+  .user-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  #userNameDisplay {
+    color: var(--amber-light);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .btn-sm {
+    padding: 0.35rem 0.85rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-sm:hover { background: rgba(255,255,255,0.1); }
+
+  /* LOGIN */
+  #loginScreen {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .login-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .login-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .login-card p {
+    color: var(--ink-faint);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: var(--warm-white);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: var(--amber);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .btn-primary:hover { background: var(--amber); }
+
+  /* MAIN APP */
+  #app {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .tab-bar {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 0 2rem;
+  }
+
+  .tab {
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* SECTION HEADERS */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-sub {
+    color: var(--ink-faint);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+  }
+
+  .form-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+    color: var(--ink);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* TASK CARDS */
+  .tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .task-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(28,26,24,0.12);
+  }
+
+  .task-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--amber);
+  }
+
+  .task-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: var(--amber-pale);
+    color: var(--amber);
+    font-weight: 500;
+  }
+
+  .task-author {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  .task-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .task-body {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .task-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .vote-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.18s;
+    color: var(--ink-light);
+  }
+
+  .vote-btn.like:hover, .vote-btn.like.voted {
+    background: var(--green-pale);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .vote-btn.dislike:hover, .vote-btn.dislike.voted {
+    background: var(--red-pale);
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .task-date {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* MY TASK BANNER */
+  .my-task-badge {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* FILTERS */
+  .filters {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-chip {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    transition: all 0.18s;
+  }
+
+  .filter-chip:hover { border-color: var(--amber); color: var(--amber); }
+  .filter-chip.active { background: var(--amber); border-color: var(--amber); color: white; }
+
+  /* EMPTY */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--ink-faint);
+  }
+
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state p { font-size: 0.9rem; }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-box {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--amber);
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    margin-top: 0.2rem;
+  }
+
+  .hidden { display: none !important; }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .task-card { animation: fadeIn 0.3s ease; }
+
+  .success-msg {
+    background: var(--green-pale);
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">P2P <span>Задания</span></div>
+  <div class="user-bar">
+    <span id="userNameDisplay"></span>
+    <button class="btn-sm" onclick="logout()">Выйти</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>P2P <span style="color:var(--amber)">Задания</span></h1>
+    <p>Обменивайтесь учебными заданиями с однокурсниками</p>
+    <div class="field-group">
+      <label>Ваше имя</label>
+      <input type="text" id="loginName" placeholder="Иван Иванов" />
+    </div>
+    <div class="field-group">
+      <label>Направление</label>
+      <select id="loginDirection">
+        <option value="">Выберите направление...</option>
+        <option>Программирование</option>
+        <option>Дизайн</option>
+        <option>Математика</option>
+        <option>Физика</option>
+        <option>Английский язык</option>
+        <option>Экономика</option>
+        <option>История</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="login()">Войти →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none; flex:1; flex-direction:column;">
+  <div class="tab-bar">
+    <div class="tab active" onclick="showTab('feed')">📋 Лента</div>
+    <div class="tab" onclick="showTab('post')">✏️ Опубликовать</div>
+    <div class="tab" onclick="showTab('mine')">👤 Мои задания</div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- FEED TAB -->
+    <div id="tab-feed">
+      <h2 class="section-title">Лента заданий</h2>
+      <p class="section-sub">Задания от всех участников — решайте и оценивайте</p>
+
+      <div class="filters" id="filterChips">
+        <button class="filter-chip active" onclick="setFilter('Все')">Все</button>
+      </div>
+
+      <div class="tasks-grid" id="feedGrid"></div>
+    </div>
+
+    <!-- POST TAB -->
+    <div id="tab-post" class="hidden">
+      <h2 class="section-title">Новое задание</h2>
+      <p class="section-sub">Опубликуйте задание для однокурсников</p>
+
+      <div class="success-msg" id="postSuccess">✅ Задание успешно опубликовано!</div>
+
+      <div class="form-card">
+        <h3>Детали задания</h3>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Направление</label>
+            <select id="taskDirection"></select>
+          </div>
+          <div class="field-group">
+            <label>Тема</label>
+            <input type="text" id="taskTheme" placeholder="Например: Алгоритмы сортировки" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Заголовок задания</label>
+          <input type="text" id="taskTitle" placeholder="Краткое название задания" />
+        </div>
+        <div class="field-group">
+          <label>Описание / Условие</label>
+          <textarea id="taskBody" placeholder="Подробно опишите задание..."></textarea>
+        </div>
+        <button class="btn-primary" onclick="postTask()">Опубликовать задание →</button>
+      </div>
+    </div>
+
+    <!-- MINE TAB -->
+    <div id="tab-mine" class="hidden">
+      <h2 class="section-title">Мои задания</h2>
+      <p class="section-sub">Задания, которые вы опубликовали</p>
+
+      <div class="stats-row" id="myStats"></div>
+      <div class="tasks-grid" id="mineGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ========== STORAGE ==========
+  const STORAGE_KEY = 'p2p_tasks_v1';
+  const VOTES_KEY = 'p2p_votes_v1';
+
+  function loadTasks() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+  }
+
+  function saveTasks(tasks) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  function loadVotes() {
+    try { return JSON.parse(localStorage.getItem(VOTES_KEY)) || {}; } catch { return {}; }
+  }
+
+  function saveVotes(votes) {
+    localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+  }
+
+  // ========== AUTH ==========
+  let currentUser = null;
+
+  function login() {
+    const name = document.getElementById('loginName').value.trim();
+    const dir = document.getElementById('loginDirection').value;
+    if (!name) { alert('Введите ваше имя'); return; }
+    if (!dir) { alert('Выберите направление'); return; }
+    currentUser = { name, direction: dir };
+    document.getElementById('userNameDisplay').textContent = name + ' · ' + dir;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('taskDirection').value = dir;
+    buildDirectionFilter();
+    buildDirectionSelect();
+    renderFeed();
+    renderMine();
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+
+  // ========== TABS ==========
+  function showTab(name) {
+    ['feed','post','mine'].forEach(t => {
+      document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+    });
+    document.querySelectorAll('.tab').forEach((el, i) => {
+      el.classList.toggle('active', ['feed','post','mine'][i] === name);
+    });
+    if (name === 'mine') renderMine();
+    if (name === 'feed') renderFeed();
+  }
+
+  // ========== DIRECTIONS ==========
+  const directions = ['Программирование','Дизайн','Математика','Физика','Английский язык','Экономика','История'];
+
+  function buildDirectionSelect() {
+    const sel = document.getElementById('taskDirection');
+    sel.innerHTML = '';
+    directions.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d; o.textContent = d;
+      if (d === currentUser.direction) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  let activeFilter = 'Все';
+
+  function buildDirectionFilter() {
+    const wrap = document.getElementById('filterChips');
+    wrap.innerHTML = '<button class="filter-chip active" onclick="setFilter(\'Все\')">Все</button>';
+    directions.forEach(d => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-chip';
+      btn.textContent = d;
+      btn.onclick = () => setFilter(d);
+      wrap.appendChild(btn);
+    });
+  }
+
+  function setFilter(dir) {
+    activeFilter = dir;
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent === dir);
+    });
+    renderFeed();
+  }
+
+  // ========== POST ==========
+  function postTask() {
+    const direction = document.getElementById('taskDirection').value;
+    const theme = document.getElementById('taskTheme').value.trim();
+    const title = document.getElementById('taskTitle').value.trim();
+    const body = document.getElementById('taskBody').value.trim();
+
+    if (!title || !body) { alert('Заполните заголовок и описание'); return; }
+
+    const tasks = loadTasks();
+    tasks.unshift({
+      id: Date.now().toString(),
+      author: currentUser.name,
+      direction,
+      theme: theme || direction,
+      title,
+      body,
+      likes: 0,
+      dislikes: 0,
+      date: new Date().toLocaleDateString('ru-RU'),
+    });
+    saveTasks(tasks);
+
+    // Reset
+    document.getElementById('taskTheme').value = '';
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskBody').value = '';
+
+    const msg = document.getElementById('postSuccess');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  }
+
+  // ========== VOTE ==========
+  function vote(taskId, type) {
+    const votes = loadVotes();
+    const key = currentUser.name + '_' + taskId;
+    const prev = votes[key];
+
+    const tasks = loadTasks();
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    if (prev === type) {
+      // Undo
+      task[type === 'like' ? 'likes' : 'dislikes']--;
+      delete votes[key];
+    } else {
+      if (prev) task[prev === 'like' ? 'likes' : 'dislikes']--;
+      task[type === 'like' ? 'likes' : 'dislikes']++;
+      votes[key] = type;
+    }
+
+    saveTasks(tasks);
+    saveVotes(votes);
+    renderFeed();
+    renderMine();
+  }
+
+  // ========== RENDER ==========
+  function taskCardHTML(task) {
+    const votes = loadVotes();
+    const key = currentUser.name + '_' + task.id;
+    const myVote = votes[key];
+    const isOwn = task.author === currentUser.name;
+
+    return `
+      <div class="task-card">
+        <div class="task-meta">
+          <span class="tag">${task.direction}</span>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            ${isOwn ? '<span class="my-task-badge">Моё</span>' : ''}
+            <span class="task-author">${task.author}</span>
+          </div>
+        </div>
+        <div class="task-title">${escHtml(task.title)}</div>
+        ${task.theme && task.theme !== task.direction ? `<div style="font-size:0.75rem;color:var(--ink-faint);margin-bottom:0.5rem;font-family:'IBM Plex Mono',monospace;"># ${escHtml(task.theme)}</div>` : ''}
+        <div class="task-body">${escHtml(task.body)}</div>
+        <div class="task-actions">
+          <button class="vote-btn like ${myVote === 'like' ? 'voted' : ''}" onclick="vote('${task.id}', 'like')">
+            👍 ${task.likes}
+          </button>
+          <button class="vote-btn dislike ${myVote === 'dislike' ? 'voted' : ''}" onclick="vote('${task.id}', 'dislike')">
+            👎 ${task.dislikes}
+          </button>
+          <span class="task-date">${task.date}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFeed() {
+    let tasks = loadTasks();
+    if (activeFilter !== 'Все') tasks = tasks.filter(t => t.direction === activeFilter);
+    const grid = document.getElementById('feedGrid');
+    if (tasks.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📭</div><p>Заданий пока нет. Будьте первым!</p></div>`;
+      return;
+    }
+    grid.innerHTML = tasks.map(taskCardHTML).join('');
+  }
+
+  function renderMine() {
+    const tasks = loadTasks().filter(t => t.author === currentUser.name);
+    const totalLikes = tasks.reduce((s, t) => s + t.likes, 0);
+    const totalDislikes = tasks.reduce((s, t) => s + t.dislikes, 0);
+
+    document.getElementById('myStats').innerHTML = `
+      <div class="stat-box"><div class="stat-num">${tasks.length}</div><div class="stat-label">Опубликовано</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--green)">${totalLikes}</div><div class="stat-label">Лайков получено</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--red)">${totalDislikes}</div><div class="stat-label">Дизлайков</div></div>
+    `;
+
+    const grid = document.getElementById('mineGrid');
+    if (tasks.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">✏️</div><p>Вы ещё не опубликовали ни одного задания</p></div>`;
+      return;
+    }
+    grid.innerHTML = tasks.map(taskCardHTML).join('');
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Seed demo tasks
+  if (loadTasks().length === 0) {
+    saveTasks([
+      { id:'demo1', author:'Алина Смирнова', direction:'Математика', theme:'Линейная алгебра', title:'Найди собственные векторы матрицы', body:'Дана матрица A = [[3,1],[0,2]]. Найдите все собственные значения и соответствующие собственные векторы. Покажите проверку решения.', likes:4, dislikes:0, date:'25.03.2025' },
+      { id:'demo2', author:'Дмитрий Ковалёв', direction:'Программирование', theme:'Алгоритмы', title:'Реализуй бинарный поиск', body:'Напишите функцию binary_search(arr, target) на любом языке программирования. Массив отсортирован. Верните индекс элемента или -1. Оцените сложность.', likes:7, dislikes:1, date:'24.03.2025' },
+      { id:'demo3', author:'Мария Петрова', direction:'Дизайн', theme:'UI/UX', title:'Нарисуй wireframe мобильного приложения', body:'Создайте wireframe для приложения по отслеживанию задач. Должны быть: главный экран, экран создания задачи, уведомления. Формат: Figma или PDF.', likes:5, dislikes:0, date:'23.03.2025' },
+    ]);
+  }
+</script>
+</body>
+</html>
